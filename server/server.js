@@ -6,9 +6,7 @@ const cors = require("cors");
 
 const app = express();
 app.use(express.json());
-app.use(
-  cors({ origin: "https://univfeedbackhub.vercel.app", credentials: true })
-);
+app.use(cors());
 
 mongoose
   .connect(process.env.DB_LINK, {})

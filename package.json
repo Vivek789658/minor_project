@@ -5,7 +5,8 @@
   "scripts": {
     "server": "node server/server.js",
     "test": "jest",
-    "start": "parcel index.html --port 3000"
+    "start": "parcel index.html --port 3000",
+    "build": "parcel build index.html"
   },
   "author": "TP",
   "license": "ISC",

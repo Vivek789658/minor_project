@@ -11,6 +11,8 @@ const Profile = () => {
   const [profileImage, setProfileImage] = useState(
     localStorage.getItem("profileImage") || null
   );
+  require("dotenv").config();
+  const path = process.env.BASE_URL;
 
   useEffect(() => {
     fetchSubjects(userId);
@@ -19,9 +21,7 @@ const Profile = () => {
   const fetchSubjects = async (userId) => {
     try {
       // Make a GET request to your backend API endpoint to fetch subjects
-      const response = await fetch(
-        `http://localhost:5000/api/v1/getSubjects/${userId}`
-      );
+      const response = await fetch(`${path}/api/v1/getSubjects/${userId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch subjects");
       }

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Header from "../student-page/Header";
 import SideBar from "../student-page/SideBar";
+require("dotenv").config();
+const path = process.env.BASE_URL;
 
 const ProfessorNotification = () => {
   const [profContactRequests, setProfRequests] = useState([]);
@@ -12,9 +14,7 @@ const ProfessorNotification = () => {
 
   const fetchProfContactRequests = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/v1/professorQueries/${_id}`
-      );
+      const response = await fetch(`${path}/api/v1/professorQueries/${_id}`);
       if (!response.ok) {
         throw new Error("Failed to fetch Professor contact requests");
       }
@@ -38,7 +38,7 @@ const ProfessorNotification = () => {
       if (request.status === "accepted") {
         try {
           const response = await fetch(
-            `http://localhost:5000/api/v1/getStudentDetails/${request.studentId}`
+            `${path}/api/v1/getStudentDetails/${request.studentId}`
           );
           if (!response.ok) {
             throw new Error("Failed to get student info");

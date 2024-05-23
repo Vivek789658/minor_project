@@ -3,6 +3,8 @@ import Header from "./Header";
 import FeedbackFormBody from "./FeedbackFormBody";
 import { useParams } from "react-router-dom";
 import SideBar from "./SideBar";
+require("dotenv").config();
+const path = process.env.BASE_URL;
 
 const GiveFeedback = () => {
   const { feedbackFormName } = useParams();
@@ -16,7 +18,7 @@ const GiveFeedback = () => {
   const fetchFeedbackForm = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/v1/feedback/${feedbackFormName}`
+        `${path}/api/v1/feedback/${feedbackFormName}`
       );
 
       if (!response.ok) {

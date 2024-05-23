@@ -3,6 +3,8 @@ import SideBar from "../student-page/SideBar";
 import SearchBar from "../student-page/SearchBar";
 import ProfessorCard from "./ProfessorCard";
 import { useEffect, useState } from "react";
+require("dotenv").config();
+const path = process.env.BASE_URL;
 
 const ProfessorPage = () => {
   const userDataString = localStorage.getItem("userData");
@@ -17,9 +19,7 @@ const ProfessorPage = () => {
   const fetchSubjects = async (professorId) => {
     try {
       // Make a GET request to your backend API endpoint to fetch subjects
-      const response = await fetch(
-        `http://localhost:5000/api/v1/getSubjects/${professorId}`
-      );
+      const response = await fetch(`${path}/api/v1/getSubjects/${professorId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch subjects");
       }

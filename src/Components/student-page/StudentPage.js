@@ -3,6 +3,8 @@ import SideBar from "./SideBar";
 import SubjectCard from "./SubjectCard";
 import SearchBar from "./SearchBar";
 import { useState, useEffect } from "react";
+require("dotenv").config();
+const path = process.env.BASE_URL;
 
 const StudentPage = () => {
   const userDataString = localStorage.getItem("userData");
@@ -18,9 +20,7 @@ const StudentPage = () => {
 
   const fetchSubjects = async (studentId) => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/v1/getSubjects/${studentId}`
-      );
+      const response = await fetch(`${path}/api/v1/getSubjects/${studentId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch subjects");
       }
@@ -33,9 +33,7 @@ const StudentPage = () => {
 
   const fetchProfessors = async (studentId) => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/v1/getProfessors/${studentId}`
-      );
+      const response = await fetch(`${path}/api/v1/getProfessors/${studentId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch Professors");
       }

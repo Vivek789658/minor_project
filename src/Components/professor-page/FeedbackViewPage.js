@@ -3,6 +3,8 @@ import PieChart from "./Piechart";
 import BarChart from "./Barchart";
 import "./FeedbackViewPage.css";
 import { useNavigate } from "react-router-dom";
+require("dotenv").config();
+const path = process.env.BASE_URL;
 
 const FeedbackViewPage = ({ feedbackFormName }) => {
   const [questions, setQuestions] = useState([]);
@@ -27,7 +29,7 @@ const FeedbackViewPage = ({ feedbackFormName }) => {
   const fetchFeedbackQuestions = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/v1/feedback/${feedbackFormName}`
+        `${path}/api/v1/feedback/${feedbackFormName}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch feedback questions");
@@ -49,7 +51,7 @@ const FeedbackViewPage = ({ feedbackFormName }) => {
   const fetchFeedbackResponses = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/v1/getfeedbackResponses/${feedbackFormName}`
+        `${path}/api/v1/getfeedbackResponses/${feedbackFormName}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch feedback data");
@@ -145,7 +147,7 @@ const FeedbackViewPage = ({ feedbackFormName }) => {
     };
 
     try {
-      const response = await fetch("http://localhost:5000/api/v1/submitReply", {
+      const response = await fetch(`${path}/api/v1/submitReply`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -189,7 +191,7 @@ const FeedbackViewPage = ({ feedbackFormName }) => {
     };
     //console.log(contactAdminData);
 
-    await fetch("http://localhost:5000/api/v1/contactAdmin", {
+    await fetch(`${path}/api/v1/contactAdmin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-
+require("dotenv").config();
+const path = process.env.BASE_URL;
 const AdminContactRequests = () => {
   // State to store admin contact requests
   const [adminContactRequests, setAdminContactRequests] = useState([]);
@@ -7,9 +8,7 @@ const AdminContactRequests = () => {
   // Function to fetch admin contact requests from the backend
   const fetchAdminContactRequests = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/v1/professorQueries"
-      );
+      const response = await fetch(`${path}/api/v1/professorQueries`);
       if (!response.ok) {
         throw new Error("Failed to fetch admin contact requests");
       }
@@ -28,7 +27,7 @@ const AdminContactRequests = () => {
   const handleStatusRequest = async (requestId, status) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/v1/professorQueries/${requestId}/${status}`,
+        `${path}/api/v1/professorQueries/${requestId}/${status}`,
         {
           method: "PUT",
         }

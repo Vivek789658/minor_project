@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { FaUser, FaEnvelope, FaCommentDots } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+require("dotenv").config();
+const path = process.env.BASE_URL;
 
 const ContactPage = () => {
   const [name, setName] = useState("");
@@ -13,7 +15,7 @@ const ContactPage = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const response = await fetch("http://localhost:5000/api/v1/contactUs", {
+    const response = await fetch(`${path}/api/v1/contactUs`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

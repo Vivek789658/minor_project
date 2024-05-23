@@ -5,12 +5,12 @@ const StudentNotifications = () => {
   const [notifications, setNotifications] = useState([]);
   const userDataString = localStorage.getItem("userData");
   const { _id } = JSON.parse(userDataString);
+  require("dotenv").config();
+  const path = process.env.BASE_URL;
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/v1/getReply/${_id}`
-      );
+      const response = await fetch(`${path}/api/v1/getReply/${_id}`);
       if (!response.ok) {
         throw new Error("Failed to fetch notifications");
       }

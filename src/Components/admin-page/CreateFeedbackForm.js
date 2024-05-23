@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+require("dotenv").config();
+const path = process.env.BASE_URL;
 
 const CreateFeedbackForm = () => {
   const [name, setName] = useState("");
@@ -149,21 +151,18 @@ const CreateFeedbackForm = () => {
     setError("");
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/v1/createFeedbackForm",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: name,
-            questions,
-            deadline: deadline,
-            startTime: startTime,
-          }),
-        }
-      );
+      const response = await fetch(`${path}/api/v1/createFeedbackForm`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: name,
+          questions,
+          deadline: deadline,
+          startTime: startTime,
+        }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to save feedback form");

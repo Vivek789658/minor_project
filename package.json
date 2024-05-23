@@ -6,7 +6,7 @@
     "server": "node server/server.js",
     "test": "jest",
     "start": "concurrently \"npm run server\" \"npm run start:frontend\"",
-    "start:frontend": "parcel index.html --port 3000",
+    "start:frontend": "parcel index.html",
     "build": "parcel build index.html"
   },
   "author": "TP",

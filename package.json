@@ -5,16 +5,17 @@
   "scripts": {
     "server": "node server/server.js",
     "test": "jest",
-    "start": "parcel index.html --port 3000",
+    "start": "concurrently \"npm run server\" \"npm run start:frontend\"",
+    "start:frontend": "parcel index.html --port 3000",
     "build": "parcel build index.html"
   },
   "author": "TP",
   "license": "ISC",
   "devDependencies": {
     "buffer": "^6.0.3",
+    "concurrently": "^8.2.2",
     "crypto-browserify": "^3.12.0",
     "events": "^3.3.0",
-    "npm-run-all": "^4.1.5",
     "os-browserify": "^0.3.0",
     "parcel": "^2.12.0",
     "path-browserify": "^1.0.1",

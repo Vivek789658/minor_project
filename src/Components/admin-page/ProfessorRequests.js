@@ -29,7 +29,7 @@ const AdminContactRequests = () => {
       const response = await fetch(
         `${path}/api/v1/professorQueries/${requestId}/${status}`,
         {
-          method: "PUT",
+          method: "POST",
         }
       );
       if (!response.ok) {

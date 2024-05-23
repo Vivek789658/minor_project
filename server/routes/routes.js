@@ -53,7 +53,7 @@ Router.post("/contactAdmin", contactAdmin);
 Router.get("/professorQueries", showProfessorQuery);
 Router.get("/professorQueries/:_id", showProfNotifications);
 Router.get("/getStudentDetails/:studentId", getStudentDetails);
-Router.put("/professorQueries/:requestId/:status", handleStatusRequest);
+Router.post("/professorQueries/:requestId/:status", handleStatusRequest);
 Router.post("/contactUs", createContact);
 
 module.exports = Router;

@@ -1,12 +1,9 @@
 {
-  "env": {
-    "NODE_ENV": "production"
-  },
+  "extends": "@parcel/config-default",
   "transformers": {
     "*.{js,jsx,ts,tsx}": [
-      "@parcel/transformer-js",
       {
-        "config": "@parcel/resolver-default",
+        "name": "@parcel/transformer-js",
         "exclude": [
           "react-refresh"
         ]

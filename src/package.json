@@ -5,8 +5,8 @@
   "scripts": {
     "server": "node server/server.js",
     "test": "jest",
-    "start": "parcel src/index.html",
-    "build": "set NODE_ENV=production && parcel build src/index.html"
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
   },
   "author": "TP",
   "license": "ISC",

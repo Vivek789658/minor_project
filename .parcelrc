@@ -8,7 +8,7 @@
       {
         "config": "@parcel/resolver-default",
         "exclude": [
-          "react-refresh/runtime"
+          "react-refresh"
         ]
       }
     ]

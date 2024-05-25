@@ -4,4 +4,4 @@ instructions
 dist
 TempUploads
 .env
-.vercel
+package-lock.json

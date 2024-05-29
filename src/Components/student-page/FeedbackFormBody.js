@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 require("dotenv").config();
-const path = process.env.BASE_URL;
+const BASE_URL = process.env.BASE_URL;
 
 const FeedbackFormBody = ({ feedbackFormData }) => {
   const [formObject, setFormObject] = useState(null);
@@ -24,7 +24,7 @@ const FeedbackFormBody = ({ feedbackFormData }) => {
       if (_id) {
         try {
           const response = await fetch(
-            `${path}/api/v1/checkSubmissionStatus?studentId=${_id}&formId=${feedbackFormData?.feedbackForm?.name}`
+            `${BASE_URL}/api/v1/checkSubmissionStatus?studentId=${_id}&formId=${feedbackFormData?.feedbackForm?.name}`
           );
           const result = await response.json();
           setIsSubmitted(result.isSubmitted);
@@ -71,7 +71,7 @@ const FeedbackFormBody = ({ feedbackFormData }) => {
     };
 
     try {
-      const response = await fetch(`${path}/api/v1/submitFeedback`, {
+      const response = await fetch(`${BASE_URL}/api/v1/submitFeedback`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

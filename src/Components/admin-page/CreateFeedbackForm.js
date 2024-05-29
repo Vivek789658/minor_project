@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 require("dotenv").config();
-const path = process.env.BASE_URL;
+const BASE_URL = process.env.BASE_URL;
 
 const CreateFeedbackForm = () => {
   const [name, setName] = useState("");
@@ -151,7 +151,7 @@ const CreateFeedbackForm = () => {
     setError("");
 
     try {
-      const response = await fetch(`${path}/api/v1/createFeedbackForm`, {
+      const response = await fetch(`${BASE_URL}/api/v1/createFeedbackForm`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

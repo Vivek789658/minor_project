@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 require("dotenv").config();
-const path = process.env.BASE_URL;
+const BASE_URL = process.env.BASE_URL;
 
 const RegisterAdmins = () => {
   const [file, setFile] = useState(null);
@@ -21,7 +21,7 @@ const RegisterAdmins = () => {
 
     try {
       const response = await axios.post(
-        `${path}/api/v1/registerAdmins`,
+        `${BASE_URL}/api/v1/registerAdmins`,
         formData,
         {
           headers: {

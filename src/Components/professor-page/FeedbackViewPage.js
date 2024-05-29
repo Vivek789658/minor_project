@@ -4,7 +4,7 @@ import BarChart from "./Barchart";
 import "./FeedbackViewPage.css";
 import { useNavigate } from "react-router-dom";
 require("dotenv").config();
-const path = process.env.BASE_URL;
+const BASE_URL = process.env.BASE_URL;
 
 const FeedbackViewPage = ({ feedbackFormName }) => {
   const [questions, setQuestions] = useState([]);
@@ -29,7 +29,7 @@ const FeedbackViewPage = ({ feedbackFormName }) => {
   const fetchFeedbackQuestions = async () => {
     try {
       const response = await fetch(
-        `${path}/api/v1/feedback/${feedbackFormName}`
+        `${BASE_URL}/api/v1/feedback/${feedbackFormName}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch feedback questions");
@@ -51,7 +51,7 @@ const FeedbackViewPage = ({ feedbackFormName }) => {
   const fetchFeedbackResponses = async () => {
     try {
       const response = await fetch(
-        `${path}/api/v1/getfeedbackResponses/${feedbackFormName}`
+        `${BASE_URL}/api/v1/getfeedbackResponses/${feedbackFormName}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch feedback data");
@@ -191,7 +191,7 @@ const FeedbackViewPage = ({ feedbackFormName }) => {
     };
     //console.log(contactAdminData);
 
-    await fetch(`${path}/api/v1/contactAdmin`, {
+    await fetch(`${BASE_URL}/api/v1/contactAdmin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

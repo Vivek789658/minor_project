@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 require("dotenv").config();
-const path = process.env.BASE_URL;
+const BASE_URL = process.env.BASE_URL;
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -12,7 +12,7 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post(`${path}/api/v1/login`, {
+      const response = await axios.post(`${BASE_URL}/api/v1/login`, {
         username,
         password,
       });

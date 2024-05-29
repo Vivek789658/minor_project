@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "server": "nodemon server.js",
+    "server": "node server.js",
     "test": "jest",
     "build": "parcel build index.html"
   },

@@ -209,7 +209,7 @@ const FeedbackFormBody = ({ feedbackFormData }) => {
       </h3>
       <form onSubmit={handleSubmit}>
         {formObject && (
-          <div className="p-4 md:px-10">
+          <div className="py-4 md:px-10">
             {formObject.questions.map((question, index) => (
               <div
                 key={index}
@@ -249,7 +249,7 @@ const FeedbackFormBody = ({ feedbackFormData }) => {
                     <div>
                       <div className="flex">
                         {[1, 2, 3, 4, 5].map((value) => (
-                          <div key={value} className="flex items-center mr-4">
+                          <div key={value} className="flex items-center mr-2">
                             <input
                               type="radio"
                               name={`question-${index}-rating`}

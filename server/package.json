@@ -5,7 +5,7 @@
   "scripts": {
     "server": "node server.js",
     "test": "jest",
-    "build": "parcel build index.html"
+    "build": "npm install"
   },
   "author": "TP",
   "license": "ISC",

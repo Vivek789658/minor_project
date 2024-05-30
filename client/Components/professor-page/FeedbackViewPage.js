@@ -147,7 +147,7 @@ const FeedbackViewPage = ({ feedbackFormName }) => {
     };
 
     try {
-      const response = await fetch(`${path}/api/v1/submitReply`, {
+      const response = await fetch(`${BASE_URL}/api/v1/submitReply`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

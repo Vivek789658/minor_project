@@ -4,7 +4,7 @@ Developed a University-Level feedback system using MERN stack, catering to three
 # Responsive
 Responsive Web Designs for mobile phones, tablets , laptops , etc . 
 
-#Detailed Information
+# Detailed Information
 Designed and Developed a website for maintaining feedback of courses/professors by students.
 1.	Sign in facilities for users.
 2.	There are three different users in this system.

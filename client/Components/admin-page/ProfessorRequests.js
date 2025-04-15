@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 require("dotenv").config();
-const BASE_URL = process.env.BASE_URL;
+const BASE_URL = "http://localhost:4000";
+
 const AdminContactRequests = () => {
-  // State to store admin contact requests
   const [adminContactRequests, setAdminContactRequests] = useState([]);
 
-  // Function to fetch admin contact requests from the backend
   const fetchAdminContactRequests = async () => {
     try {
       const response = await fetch(`${BASE_URL}/api/v1/professorQueries`);
@@ -23,7 +22,6 @@ const AdminContactRequests = () => {
     fetchAdminContactRequests();
   }, []);
 
-  // Function to handle accepting or Rejecting a request
   const handleStatusRequest = async (requestId, status) => {
     try {
       const response = await fetch(
@@ -35,7 +33,6 @@ const AdminContactRequests = () => {
       if (!response.ok) {
         throw new Error(`Failed to ${status} request`);
       }
-      // Remove the accepted request from the list
       setAdminContactRequests((prevRequests) =>
         prevRequests.filter((request) => request._id !== requestId)
       );
@@ -45,17 +42,18 @@ const AdminContactRequests = () => {
   };
 
   return (
-    <div className="bg-gray-100 p-4 rounded-lg shadow-md h-[calc(100vh-35vh)] overflow-y-auto">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">
+    <div className="p-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">
         Check Professor Queries related to Feedback Form
       </h2>
-      <ul className="list-none divide-y divide-gray-200 divide-dashed">
+
+      <div className="space-y-4">
         {adminContactRequests.map((request) => (
-          <li
+          <div
             key={request._id}
-            className="py-4 px-2 flex flex-col space-y-2 bg-white rounded-md shadow-md"
+            className="border-b border-gray-200 pb-4"
           >
-            <div className="flex justify-between items-center bg-gray-200 p-2 rounded-md">
+            <div className="flex justify-between items-center mb-4">
               <p className="text-gray-700 font-medium">
                 Professor ID: {request.professorId}
               </p>
@@ -63,30 +61,46 @@ const AdminContactRequests = () => {
                 {new Date(request.timestamp).toLocaleString()}
               </p>
             </div>
-            <div className="flex flex-col space-y-1 p-2">
-              <p className="text-gray-600">Student ID: {request.studentId}</p>
-              <p className="text-gray-600">Form Name: {request.formName}</p>
-              <p className="text-gray-600">Question: {request.question}</p>
-              <p className="text-gray-600">Answer: {request.answer}</p>
-              <p className="text-gray-600">Reason: {request.reason}</p>
-              <div className="flex space-x-4">
-                <button
-                  onClick={() => handleStatusRequest(request._id, "accepted")}
-                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
-                >
-                  Accept
-                </button>
-                <button
-                  onClick={() => handleStatusRequest(request._id, "rejected")}
-                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
-                >
-                  Reject
-                </button>
-              </div>
+
+            <div className="space-y-2">
+              <p className="text-gray-600">
+                <span className="font-medium">Student ID:</span> {request.studentId}
+              </p>
+              <p className="text-gray-600">
+                <span className="font-medium">Form Name:</span> {request.formName}
+              </p>
+              <p className="text-gray-600">
+                <span className="font-medium">Question:</span> {request.question}
+              </p>
+              <p className="text-gray-600">
+                <span className="font-medium">Answer:</span> {request.answer}
+              </p>
+              <p className="text-gray-600">
+                <span className="font-medium">Reason:</span> {request.reason}
+              </p>
             </div>
-          </li>
+
+            <div className="flex space-x-4 mt-4">
+              <button
+                onClick={() => handleStatusRequest(request._id, "accepted")}
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition duration-150"
+              >
+                Accept
+              </button>
+              <button
+                onClick={() => handleStatusRequest(request._id, "rejected")}
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition duration-150"
+              >
+                Reject
+              </button>
+            </div>
+          </div>
         ))}
-      </ul>
+
+        {adminContactRequests.length === 0 && (
+          <p className="text-gray-500 text-center py-4">No queries found</p>
+        )}
+      </div>
     </div>
   );
 };

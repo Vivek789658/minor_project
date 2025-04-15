@@ -37,7 +37,7 @@ const ProfessorCard = ({
           </h4>
         </div>
         <Link
-          to={`/seeFeedback/${feedbackFormName}`}
+          to={`/see-feedback/${feedbackFormName}`}
           className="flex items-center text-white border-2 border-green-700 py-2 px-4 bg-green-500 rounded-md hover:bg-green-600 hover:shadow-xl text-sm sm:text-md font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-700 transition-all duration-200 ease-in-out"
         >
           <span>See Feedback</span>
@@ -48,3 +48,6 @@ const ProfessorCard = ({
 };
 
 export default ProfessorCard;
+
+
+

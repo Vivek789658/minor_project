@@ -1,93 +1,260 @@
-import Header from "../student-page/Header";
+import React, { useState, useEffect } from "react";
 import AddSubjects from "./AddSubjects";
 import AssignSubjects from "./AssignSubjects";
 import RegisterProfessors from "./RegisterProfessors";
-import Register from "./RegisterStudents";
+import RegisterStudents from "./RegisterStudents";
 import WelcomeMsg from "./WelcomeMsg";
 import CreateFeedbackForm from "./CreateFeedbackForm";
-import { useState } from "react";
-import RegisterAdmins from "./RegisterAdmin";
-import AdminContactRequests from "./ProfessorRequests";
+import ProfessorRequests from "./ProfessorRequests";
+import AdminChartVisualization from "./AdminChartVisualization";
+import ManageFeedbackForms from "./ManageFeedbackForms";
+import StudentFeedbackResponses from "./StudentFeedbackResponses";
+import { FaHome, FaUsers, FaBook, FaClipboardList, FaChartBar, FaEnvelope, FaSignOutAlt, FaBars, FaChevronLeft, FaSun, FaMoon, FaListAlt, FaComments, FaCalendarAlt, FaBell, FaChartLine, FaTasks } from 'react-icons/fa';
+import "./AdminPage.css";
 
 const tabs = [
-  {
-    id: "register admins",
-    label: "Register Admins ",
-    component: <RegisterAdmins />,
-  },
-  {
-    id: "register",
-    label: "Register Students ",
-    component: <Register />,
-  },
-  {
-    id: "addSubjects",
-    label: "Add Subjects ",
-    component: <AddSubjects />,
-  },
-  {
-    id: "registerProfessors",
-    label: "Register Professors ",
-    component: <RegisterProfessors />,
-  },
-  {
-    id: "assignSubjects",
-    label: "Assign Subjects to Professors ",
-    component: <AssignSubjects />,
-  },
-  {
-    id: "createFeedBackForm",
-    label: "Create a Feedback Form",
-    component: <CreateFeedbackForm />,
-  },
-  {
-    id: "professorQueries",
-    label: "Check Professor Queries",
-    component: <AdminContactRequests />,
-  },
+  { id: "welcome", label: "Welcome", icon: <FaHome size={20} />, component: <WelcomeMsg /> },
+  { id: "registerStudents", label: "Register Students", icon: <FaUsers size={20} />, component: <RegisterStudents /> },
+  { id: "addSubjects", label: "Add Subjects", icon: <FaBook size={20} />, component: <AddSubjects /> },
+  { id: "registerProfessors", label: "Register Professors", icon: <FaUsers size={20} />, component: <RegisterProfessors /> },
+  { id: "assignSubjects", label: "Assign Subjects", icon: <FaClipboardList size={20} />, component: <AssignSubjects /> },
+  { id: "createFeedbackForm", label: "Create Feedback Form", icon: <FaChartBar size={20} />, component: <CreateFeedbackForm /> },
+  { id: "manageFeedbackForms", label: "Manage Feedback Forms", icon: <FaListAlt size={20} />, component: <ManageFeedbackForms /> },
+  { id: "studentFeedback", label: "Student Feedback", icon: <FaComments size={20} />, component: <StudentFeedbackResponses /> },
+  { id: "professorQueries", label: "Check Professor Queries", icon: <FaEnvelope size={20} />, component: <ProfessorRequests /> },
+  { id: "visualizeFeedback", label: "Visualize Feedback Data", icon: <FaChartBar size={20} />, component: <AdminChartVisualization /> },
 ];
 
 const AdminPage = () => {
-  const [activeTab, setActiveTab] = useState(null); // Initial state for active tab
+  const [activeTab, setActiveTab] = useState("welcome");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showLogout, setShowLogout] = useState(false);
+  const [adminName, setAdminName] = useState("Administrator");
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
 
-  const handleTabClick = (tabId) => {
-    setActiveTab(tabId);
+  // Theme effect
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
   };
 
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      if (!mobile && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isMobileMenuOpen]);
+
+  // Get admin name from localStorage
+  useEffect(() => {
+    const userDataString = localStorage.getItem("userData");
+    if (userDataString) {
+      try {
+        const userData = JSON.parse(userDataString);
+        if (userData && userData.name) {
+          setAdminName(userData.name);
+        }
+      } catch (error) {
+        console.error("Error parsing userData:", error);
+      }
+    }
+  }, []);
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isMobileMenuOpen && !event.target.closest('.admin-sidebar') && !event.target.closest('.menu-toggle')) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMobileMenuOpen]);
+
+  const handleTabClick = (tabId) => {
+    if (activeTab !== tabId) {
+      setActiveTab(tabId);
+      if (isMobile) {
+        setIsMobileMenuOpen(false);
+      }
+      // Scroll to top when changing tabs
+      window.scrollTo(0, 0);
+    }
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+    if (showLogout) {
+      setShowLogout(false);
+    }
+  };
+
+  const handleLogout = () => {
+    try {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = "/";
+    } catch (error) {
+      console.error('Logout error:', error);
+      window.location.href = "/";
+    }
+  };
+
+  const toggleLogout = () => {
+    setShowLogout(!showLogout);
+  };
+
+  const toggleSidebar = () => {
+    if (!isMobile) {
+      setIsSidebarCollapsed(!isSidebarCollapsed);
+    }
+  };
+
+  // Get the current component to render
+  const currentComponent = tabs.find(tab => tab.id === activeTab)?.component;
+
   return (
-    <div className="">
-      <Header />
-      <div className="flex px-4 py-1.5 flex-col md:flex-row h-[calc(100vh-13vh)] ">
-        <nav className="bg-gray-800 text-white rounded-lg shadow-md my-3 mx-4 md:overflow-y-auto">
-          <ul className="flex flex-col space-y-2 p-4">
-            {tabs.map((tab) => (
-              <li
-                key={tab.id}
-                className={`cursor-pointer hover:bg-gray-700 py-2 px-4 rounded-lg text-lg font-semi-bold text-center ${
-                  activeTab === tab.id ? "bg-blue-500 text-white" : ""
-                }`}
-                onClick={() => handleTabClick(tab.id)}
+    <div className="admin-page">
+      {/* Theme Toggle Button */}
+      <button
+        className="theme-toggle"
+        onClick={toggleTheme}
+        aria-label={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+      >
+        {theme === 'light' ? <FaMoon /> : <FaSun />}
+        {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+      </button>
+
+      <div className="admin-main">
+        {/* Sidebar */}
+        <aside className={`admin-sidebar ${isMobileMenuOpen ? 'open' : ''} ${isSidebarCollapsed ? 'collapsed' : ''}`}>
+          <div className="sidebar-content">
+            {/* Profile Section */}
+            <div className="admin-profile">
+              <div className="profile-section" onClick={toggleLogout}>
+                <img
+                  src="http://localhost:1234/profile.e71834e8.jpg"
+                  alt="Admin Profile"
+                  className="profile-img"
+                />
+                <div className="profile-info">
+                  <p className="profile-name">{adminName}</p>
+                  <p className="profile-role">Administrator</p>
+                </div>
+              </div>
+              {showLogout && (
+                <div className="logout-dropdown">
+                  <button
+                    onClick={handleLogout}
+                    className="logout-button"
+                  >
+                    <FaSignOutAlt />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="admin-divider" />
+
+            {/* Navigation Tabs */}
+            <nav className="nav-section">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  className={`admin-tab ${activeTab === tab.id ? "active" : ""}`}
+                  onClick={() => handleTabClick(tab.id)}
+                  data-title={tab.label}
+                  aria-label={tab.label}
+                  aria-current={activeTab === tab.id ? "page" : undefined}
+                >
+                  {tab.icon}
+                  <span>{tab.label}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          {/* Sidebar Toggle Button */}
+          <button
+            className="sidebar-toggle"
+            onClick={toggleSidebar}
+            title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+        </aside>
+
+        {/* Mobile Menu Toggle */}
+        {isMobile && (
+          <button
+            className="menu-toggle"
+            onClick={toggleMobileMenu}
+            aria-label="Toggle Menu"
+          >
+            {isMobileMenuOpen ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
-                {tab.label}
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <div className="border my-3 px-6 py-6 shadow-xl bg-cyan-50 mx-4 rounded-md h-auto md:w-full">
-          <div className="border-b-2 border-gray-200 pb-4 mb-4">
-            <h2 className="text-xl font-bold text-gray-800 mb-2 md:text-xl">
-              {tabs.find((tab) => tab.id === activeTab)?.label}
-            </h2>
-          </div>
-          <div className="">
-            {activeTab === null ? (
-              <WelcomeMsg />
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
             ) : (
-              tabs.find((tab) => tab.id === activeTab)?.component
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
             )}
-          </div>
-        </div>
+          </button>
+        )}
+
+        {/* Main Content */}
+        <main className={`admin-content ${isSidebarCollapsed ? 'collapsed' : ''}`}>
+          {currentComponent}
+        </main>
       </div>
+
+      {/* Sidebar Overlay */}
+      {isMobile && isMobileMenuOpen && <div className="sidebar-overlay" onClick={toggleMobileMenu} />}
     </div>
   );
 };

@@ -1,44 +1,72 @@
-const FeedbacksReceived = require("../models/FeedbacksReceived");
+const FeedbackForm = require("../models/FeedbackFormScheema");
+const FeedbackResponse = require("../models/FeedbackResponseScheema");
+const debug = require("debug")("app:submitFeedback");
 
 const submitFeedback = async (req, res) => {
   try {
-    const { name, responses } = req.body;
+    const { formName, studentId, answers } = req.body;
 
-    // Find the existing feedback document based on the name
-    let feedback = await FeedbacksReceived.findOne({ name });
+    debug("Submitting feedback:", { formName, studentId, answersCount: answers.length });
 
-    // If the feedback document doesn't exist, create a new one
-    if (!feedback) {
-      feedback = new FeedbacksReceived({
-        name,
-        responses: responses.map(({ studentId, answers }) => ({
-          studentId,
-          answers,
-        })),
-      });
-    } else {
-      // Iterate over each response and update the answers array for each student
-      responses.forEach(({ studentId, answers }) => {
-        const index = feedback.responses.findIndex(
-          (res) => res.studentId === studentId
-        );
-        if (index === -1) {
-          feedback.responses.push({ studentId, answers });
-        } else {
-          feedback.responses[index].answers.push(...answers);
-        }
+    // Validate required fields
+    if (!formName || !studentId || !answers || !Array.isArray(answers)) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields or invalid data format"
       });
     }
 
-    // Save the updated feedback document to the database
-    await feedback.save();
+    // Check if form exists
+    const form = await FeedbackForm.findOne({ name: formName });
+    if (!form) {
+      return res.status(404).json({
+        success: false,
+        message: "Feedback form not found"
+      });
+    }
 
-    // Send a success response
-    res.status(201).json({ message: "Feedback submitted successfully" });
+    // Validate number of answers matches number of questions
+    if (answers.length !== form.questions.length) {
+      return res.status(400).json({
+        success: false,
+        message: "Number of answers does not match number of questions"
+      });
+    }
+
+    // Check if student has already submitted feedback
+    const existingResponse = await FeedbackResponse.findOne({
+      formName,
+      studentId
+    });
+
+    if (existingResponse) {
+      return res.status(400).json({
+        success: false,
+        message: "You have already submitted feedback for this form"
+      });
+    }
+
+    // Create new feedback response
+    const feedbackResponse = new FeedbackResponse({
+      formName,
+      studentId,
+      answers,
+      submittedAt: new Date()
+    });
+
+    await feedbackResponse.save();
+    debug("Feedback submitted successfully");
+
+    res.status(201).json({
+      success: true,
+      message: "Feedback submitted successfully"
+    });
   } catch (error) {
-    console.error("Error submitting feedback:", error);
-    // Send an error response
-    res.status(500).json({ error: "Failed to submit feedback" });
+    debug("Error submitting feedback:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to submit feedback"
+    });
   }
 };
 

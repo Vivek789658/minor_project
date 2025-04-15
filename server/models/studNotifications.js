@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const studentNotificationsSchema = new mongoose.Schema({
   studentId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Students",
+    ref: "student",
     required: true,
   },
   formName: { type: String, required: true },

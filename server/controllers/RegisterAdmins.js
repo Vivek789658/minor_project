@@ -32,10 +32,10 @@ const RegisterAdmins = async (req, res) => {
 
     // Read the uploaded CSV file
     const csvData = await parseCSV(req.file.path);
-
+    console.log(formattedData);
     // Convert CSV data to an array of objects suitable for MongoDB
     const formattedData = convertCSVToObjects(csvData);
-
+     
     // Insert data into MongoDB using the UserModel
     await AdminsModel.insertMany(formattedData);
 

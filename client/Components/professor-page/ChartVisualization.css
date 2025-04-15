@@ -1,0 +1,27 @@
+.chart-visualization-container {
+    padding: 20px;
+    background-color: #f4f4f4;
+    min-height: 100vh;
+}
+
+.chart-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 0 auto 40px;
+    width: 100%;
+    max-width: 800px;
+    border: 1px solid #e0e0e0;
+}
+
+canvas {
+    width: 100% !important;
+    height: 300px;
+}
+
+@media (max-width: 768px) {
+    .chart-container {
+        padding: 15px;
+    }
+}

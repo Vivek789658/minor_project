@@ -4,7 +4,7 @@ import BarChart from "./Barchart";
 import "./FeedbackViewPage.css";
 import { useNavigate } from "react-router-dom";
 require("dotenv").config();
-const BASE_URL = process.env.BASE_URL;
+const BASE_URL = "http://localhost:4000/api/v1";
 
 const FeedbackViewPage = ({ feedbackFormName }) => {
   const [questions, setQuestions] = useState([]);
@@ -29,7 +29,7 @@ const FeedbackViewPage = ({ feedbackFormName }) => {
   const fetchFeedbackQuestions = async () => {
     try {
       const response = await fetch(
-        `${BASE_URL}/api/v1/feedback/${feedbackFormName}`
+        `${BASE_URL}/feedback/${feedbackFormName}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch feedback questions");
@@ -51,7 +51,7 @@ const FeedbackViewPage = ({ feedbackFormName }) => {
   const fetchFeedbackResponses = async () => {
     try {
       const response = await fetch(
-        `${BASE_URL}/api/v1/getfeedbackResponses/${feedbackFormName}`
+        `${BASE_URL}/getfeedbackResponses/${feedbackFormName}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch feedback data");
@@ -90,42 +90,34 @@ const FeedbackViewPage = ({ feedbackFormName }) => {
     setActiveResponseType(selectedQuestionAnswers.questionType);
     setActiveQuestionDescription(questions[index].description);
 
-    switch (selectedQuestionAnswers.questionType) {
-      case "text":
-        setTextAnswers(selectedQuestionAnswers.answers.filter(Boolean));
-        break;
-      case "yesNo":
-        const yesCount = selectedQuestionAnswers.answers.filter(
-          (answer) => answer === "Yes"
-        ).length;
-        const noCount = selectedQuestionAnswers.answers.filter(
-          (answer) => answer === "No"
-        ).length;
-        setYesNoData([yesCount, noCount]);
-        break;
-      case "rating":
-        const ratings = selectedQuestionAnswers.answers.map(Number);
-        const ratingCounts = Array.from(
-          { length: 5 },
-          (_, i) => ratings.filter((rating) => rating === i + 1).length
-        );
-        setRatingData(ratingCounts);
-        break;
-      case "multiple":
-        const answerCounts = selectedQuestionAnswers.answers.reduce(
-          (acc, answer) => {
-            acc[answer] = (acc[answer] || 0) + 1;
-            return acc;
-          },
-          {}
-        );
-        const labels = Object.keys(answerCounts);
-        const counts = Object.values(answerCounts);
-        setMultipleChoiceData(counts);
-        setMultipleChoiceLabels(labels);
-        break;
-      default:
-        break;
+    // Process answers based on question type
+    if (selectedQuestionAnswers.questionType === "text") {
+      setTextAnswers(selectedQuestionAnswers.answers);
+    } else if (selectedQuestionAnswers.questionType === "yesNo") {
+      const yesCount = selectedQuestionAnswers.answers.filter(
+        (answer) => answer === "Yes"
+      ).length;
+      const noCount = selectedQuestionAnswers.answers.filter(
+        (answer) => answer === "No"
+      ).length;
+      setYesNoData([yesCount, noCount]);
+    } else if (selectedQuestionAnswers.questionType === "rating") {
+      const ratingCounts = [0, 0, 0, 0, 0];
+      selectedQuestionAnswers.answers.forEach((rating) => {
+        const index = parseInt(rating) - 1;
+        if (index >= 0 && index < 5) {
+          ratingCounts[index]++;
+        }
+      });
+      setRatingData(ratingCounts);
+    } else if (selectedQuestionAnswers.questionType === "multiple") {
+      // For multiple choice, we need to count occurrences of each option
+      const optionCounts = {};
+      selectedQuestionAnswers.answers.forEach((answer) => {
+        optionCounts[answer] = (optionCounts[answer] || 0) + 1;
+      });
+      setMultipleChoiceLabels(Object.keys(optionCounts));
+      setMultipleChoiceData(Object.values(optionCounts));
     }
   };
 
@@ -147,7 +139,7 @@ const FeedbackViewPage = ({ feedbackFormName }) => {
     };
 
     try {
-      const response = await fetch(`${BASE_URL}/api/v1/submitReply`, {
+      const response = await fetch(`${BASE_URL}/submitReply`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -191,7 +183,7 @@ const FeedbackViewPage = ({ feedbackFormName }) => {
     };
     //console.log(contactAdminData);
 
-    await fetch(`${BASE_URL}/api/v1/contactAdmin`, {
+    await fetch(`${BASE_URL}/contactAdmin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

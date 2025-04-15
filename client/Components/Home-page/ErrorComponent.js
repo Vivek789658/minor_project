@@ -1,10 +1,11 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import zoro from "./404.png";
 
 const ErrorPage = () => {
   const userDataString = localStorage.getItem("userData");
-  const { type } = userDataString ? JSON.parse(userDataString) : null;
+  const userData = userDataString ? JSON.parse(userDataString) : {};
+  const type = userData?.type || ""; // Provide default empty string if type is undefined
 
   return (
     <div className="error-container flex items-center justify-center h-screen bg-gradient-to-t from-gray-200 to-white">
@@ -17,12 +18,12 @@ const ErrorPage = () => {
           the URL incorrectly.
         </p>
         <img src={zoro} alt="Error page illustration" />
-        <Link
-          to={`/${type}`}
-          className="px-6 py-3 bg-purple-600 text-white font-bold rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        <a
+          href={type === "admin" ? "/admin" : type === "professor" ? "/professor" : "/"}
+          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg transition duration-300"
         >
-          Take me home
-        </Link>
+          Go Back Home
+        </a>
       </div>
     </div>
   );

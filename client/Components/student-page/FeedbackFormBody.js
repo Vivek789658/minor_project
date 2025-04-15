@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 require("dotenv").config();
-const BASE_URL = process.env.BASE_URL;
+const BASE_URL = "http://localhost:4000";
 
-const FeedbackFormBody = ({ feedbackFormData }) => {
+const FeedbackFormBody = ({ feedbackFormData, onSubmit }) => {
   const [formObject, setFormObject] = useState(null);
   const [startTime, setStartTime] = useState(null);
   const [deadline, setDeadline] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [answers, setAnswers] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,15 +23,19 @@ const FeedbackFormBody = ({ feedbackFormData }) => {
       const userDataString = localStorage.getItem("userData");
       const { _id } = userDataString ? JSON.parse(userDataString) : null;
 
-      if (_id) {
+      if (_id && feedbackFormData?.feedbackForm?.name) {
         try {
           const response = await fetch(
-            `${BASE_URL}/api/v1/checkSubmissionStatus?studentId=${_id}&formId=${feedbackFormData?.feedbackForm?.name}`
+            `${BASE_URL}/api/v1/checkSubmissionStatus?studentId=${_id}&formId=${feedbackFormData.feedbackForm.name}`
           );
+          if (!response.ok) {
+            throw new Error("Failed to check submission status");
+          }
           const result = await response.json();
           setIsSubmitted(result.isSubmitted);
         } catch (error) {
           console.error("Error checking submission status:", error);
+          setErrorMessage("Failed to check submission status");
         }
       }
     };
@@ -37,61 +43,34 @@ const FeedbackFormBody = ({ feedbackFormData }) => {
     checkSubmissionStatus();
   }, [feedbackFormData]);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.target);
+  const handleAnswerChange = (questionIndex, value) => {
+    setAnswers(prev => ({
+      ...prev,
+      [questionIndex]: value
+    }));
+    setErrorMessage(""); // Clear any previous error messages
+  };
 
-    const feedbackResponses = [];
-    for (const [questionIndex, question] of formObject.questions.entries()) {
-      let answer;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMessage("");
 
-      if (question.type === "text") {
-        answer = formData.get(`question-${questionIndex}-text`);
-      } else if (question.type === "yesNo") {
-        answer = formData.get(`question-${questionIndex}-yesNo`);
-      } else if (question.type === "rating") {
-        answer = formData.get(`question-${questionIndex}-rating`);
-      } else if (question.type === "multiple") {
-        answer = formData.get(`question-${questionIndex}-multiple`);
-      }
-
-      feedbackResponses.push(answer);
+    // Validate all questions are answered
+    const unansweredQuestions = Object.values(answers).some(answer => !answer.trim());
+    if (unansweredQuestions) {
+      setErrorMessage("Please answer all questions before submitting.");
+      return;
     }
 
-    const userDataString = localStorage.getItem("userData");
-    const { _id } = userDataString ? JSON.parse(userDataString) : null;
-    const feedbackData = {
-      name: formObject.name,
-      responses: [
-        {
-          studentId: _id,
-          answers: feedbackResponses,
-        },
-      ],
-    };
-
     try {
-      const response = await fetch(`${BASE_URL}/api/v1/submitFeedback`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(feedbackData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to submit feedback");
-      }
-
-      setSuccessMessage("Feedback submitted successfully!");
-      setErrorMessage(""); // Clear any previous error message
-      setTimeout(() => {
-        navigate("/student");
-      }, 2000);
+      setLoading(true);
+      await onSubmit(Object.values(answers));
     } catch (error) {
       console.error("Error submitting feedback:", error);
-      setErrorMessage("Failed to submit feedback. Please try again.");
-      setSuccessMessage(""); // Clear any previous success message
+      setErrorMessage(error.message || "Failed to submit feedback. Please try again later.");
+      setSuccessMessage("");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -103,9 +82,7 @@ const FeedbackFormBody = ({ feedbackFormData }) => {
     if (timeDiff <= 0) return null;
 
     const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor(
-      (timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-    );
+    const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
 
@@ -114,7 +91,7 @@ const FeedbackFormBody = ({ feedbackFormData }) => {
 
   if (isSubmitted) {
     return (
-      <div className=" flex items-center justify-center w-5/6">
+      <div className="flex items-center justify-center w-5/6">
         <div className="flex flex-col items-center mt-10 border p-10 rounded-md bg-green-100 w-11/12">
           <h2 className="text-5xl font-semibold text-green-500 mb-2 text-center">
             Feedback Submitted
@@ -140,7 +117,7 @@ const FeedbackFormBody = ({ feedbackFormData }) => {
       <div className="flex items-center justify-center w-5/6">
         <div className="flex flex-col items-center mt-10 border p-10 rounded-md bg-yellow-100 w-11/12">
           <h2 className="text-5xl font-semibold text-yellow-500 mb-2 text-center">
-            Form Not Available
+            Form Not Available Yet
           </h2>
           <p className="text-2xl text-gray-700 mb-4 text-center">
             This form will be available in:
@@ -148,7 +125,7 @@ const FeedbackFormBody = ({ feedbackFormData }) => {
           <p className="text-xl text-gray-700 mb-4">
             {timeUntilStart.days} days, {timeUntilStart.hours} hours,{" "}
             {timeUntilStart.minutes} minutes, and {timeUntilStart.seconds}{" "}
-            seconds.
+            seconds
           </p>
           <button
             onClick={() => navigate("/student")}
@@ -163,13 +140,13 @@ const FeedbackFormBody = ({ feedbackFormData }) => {
 
   if (deadline && currentDate > new Date(deadline)) {
     return (
-      <div className=" flex items-center justify-center w-5/6">
+      <div className="flex items-center justify-center w-5/6">
         <div className="flex flex-col items-center mt-10 border p-10 rounded-md bg-red-100 w-11/12">
           <h2 className="text-5xl font-semibold text-red-500 mb-2 text-center">
             Deadline Passed
           </h2>
           <p className="text-2xl text-gray-700 mb-4 text-center">
-            Sorry, this form is no longer accepting any responses.
+            Sorry, this form is no longer accepting responses.
           </p>
           <button
             onClick={() => navigate("/student")}
@@ -181,15 +158,16 @@ const FeedbackFormBody = ({ feedbackFormData }) => {
       </div>
     );
   }
+
   if (!formObject) {
     return (
-      <div className=" flex items-center justify-center w-5/6">
+      <div className="flex items-center justify-center w-5/6">
         <div className="flex flex-col items-center mt-10 border p-10 rounded-md bg-blue-100 w-11/12">
           <h2 className="text-5xl font-semibold text-blue-500 mb-2 text-center">
-            Form Not Created
+            Form Not Found
           </h2>
           <p className="text-2xl text-gray-700 mb-4 text-center">
-            Sorry, this feedback form is not yet Created.
+            Sorry, this feedback form does not exist or has not been created yet.
           </p>
           <button
             onClick={() => navigate("/student")}
@@ -207,104 +185,119 @@ const FeedbackFormBody = ({ feedbackFormData }) => {
       <h3 className="px-5 py-2 text-xl md:text-2xl rounded-md bg-purple-400 font-bold text-white">
         Feedback Form
       </h3>
-      <form onSubmit={handleSubmit}>
-        {formObject && (
-          <div className="py-4 md:px-10">
-            {formObject.questions.map((question, index) => (
-              <div
-                key={index}
-                className="bg-white p-4 rounded-lg shadow-md my-4 border border-teal-400"
-              >
-                <p className="text-lg font-semibold mb-2">
-                  {question.description}
-                </p>
-                <div className="mt-2">
-                  {question.type === "text" && (
-                    <input
-                      type="text"
-                      name={`question-${index}-text`}
-                      className="w-full border rounded-lg py-2 px-4 focus:outline-none focus:border-blue-500"
-                      placeholder="Enter your answer"
-                    />
-                  )}
-                  {question.type === "yesNo" && (
-                    <div className="flex items-center">
-                      <input
-                        type="radio"
-                        name={`question-${index}-yesNo`}
-                        value="Yes"
-                        className="mr-2"
-                      />
-                      <label className="mr-4">Yes</label>
-                      <input
-                        type="radio"
-                        name={`question-${index}-yesNo`}
-                        value="No"
-                        className="mr-2"
-                      />
-                      <label>No</label>
-                    </div>
-                  )}
-                  {question.type === "rating" && (
-                    <div>
-                      <div className="flex">
-                        {[1, 2, 3, 4, 5].map((value) => (
-                          <div key={value} className="flex items-center mr-2">
-                            <input
-                              type="radio"
-                              name={`question-${index}-rating`}
-                              value={value}
-                              className="mr-1"
-                            />
-                            <label className="mr-2">{value}</label>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {question.type === "multiple" && (
-                    <div className="space-y-2">
-                      {question.options.map((option, optionIndex) => (
-                        <div key={optionIndex} className="flex items-center">
-                          <input
-                            type="radio"
-                            name={`question-${index}-multiple`}
-                            value={option}
-                            className="mr-2"
-                          />
-                          <label className="mr-4">{option}</label>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+
+      {successMessage && (
+        <div className="bg-green-200 text-green-800 p-4 rounded mt-4">
+          {successMessage}
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className="bg-red-200 text-red-800 p-4 rounded mt-4">
+          {errorMessage}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {errorMessage && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+            {errorMessage}
           </div>
         )}
-        <div className="flex justify-center items-center">
+
+        {formObject.questions.map((question, index) => (
+          <div key={index} className="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+            <label className="block text-gray-700 text-lg font-semibold mb-3">
+              Question {index + 1}: {question.description}
+            </label>
+            {question.type === "text" && (
+              <textarea
+                className="w-full px-4 py-3 text-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150"
+                rows="4"
+                value={answers[index] || ""}
+                onChange={(e) => handleAnswerChange(index, e.target.value)}
+                placeholder="Write your answer here..."
+                required
+              />
+            )}
+            {question.type === "yesNo" && (
+              <div className="space-x-4">
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name={`question-${index}`}
+                    value="Yes"
+                    checked={answers[index] === "Yes"}
+                    onChange={(e) => handleAnswerChange(index, e.target.value)}
+                    className="form-radio h-5 w-5 text-blue-600"
+                    required
+                  />
+                  <span className="ml-2 text-gray-700">Yes</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name={`question-${index}`}
+                    value="No"
+                    checked={answers[index] === "No"}
+                    onChange={(e) => handleAnswerChange(index, e.target.value)}
+                    className="form-radio h-5 w-5 text-blue-600"
+                    required
+                  />
+                  <span className="ml-2 text-gray-700">No</span>
+                </label>
+              </div>
+            )}
+            {question.type === "rating" && (
+              <div className="space-x-4">
+                {[1, 2, 3, 4, 5].map((rating) => (
+                  <label key={rating} className="inline-flex items-center">
+                    <input
+                      type="radio"
+                      name={`question-${index}`}
+                      value={rating}
+                      checked={answers[index] === rating.toString()}
+                      onChange={(e) => handleAnswerChange(index, e.target.value)}
+                      className="form-radio h-5 w-5 text-blue-600"
+                      required
+                    />
+                    <span className="ml-2 text-gray-700">{rating}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+            {question.type === "multiple" && (
+              <div className="space-y-2">
+                {question.options.map((option, optionIndex) => (
+                  <label key={optionIndex} className="block">
+                    <input
+                      type="radio"
+                      name={`question-${index}`}
+                      value={option}
+                      checked={answers[index] === option}
+                      onChange={(e) => handleAnswerChange(index, e.target.value)}
+                      className="form-radio h-5 w-5 text-blue-600"
+                      required
+                    />
+                    <span className="ml-2 text-gray-700">{option}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+
+        <div className="flex justify-end space-x-4 pt-6 border-t">
           <button
             type="submit"
-            className="bg-green-500 text-white py-2 px-6 mt-4 rounded-sm hover:bg-green-600 transition duration-300 ease-in-out"
+            disabled={loading}
+            className={`px-6 py-2.5 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ${loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
           >
-            Submit
+            {loading ? "Submitting..." : "Submit Feedback"}
           </button>
         </div>
       </form>
-      {successMessage && (
-        <div className="flex justify-center items-center mt-4">
-          <div className="bg-green-200 text-green-800 p-4 rounded">
-            {successMessage}
-          </div>
-        </div>
-      )}
-      {errorMessage && (
-        <div className="flex justify-center items-center mt-4">
-          <div className="bg-red-200 text-red-800 p-4 rounded">
-            {errorMessage}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

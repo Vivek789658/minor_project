@@ -31,9 +31,9 @@ const HomePage = () => {
   return (
     <div className="home-screen bg-cyan-50 min-h-screen">
       <header className="header flex justify-between items-center px-2 py-3.5 bg-pink-100 shadow-md md:justify-start md:gap-4 md:px-16 border-2 border-pink-200">
-        <img src={logo} alt="LOGO-IMG" className="logo w-48"></img>
+        {/* <img src={logo} alt="LOGO-IMG" className="logo w-48"></img> */}
         <p className="university-info text-md text-start font-semibold md:w-48">
-          Graphic Era Hill University Dehradun, Uttarakhand
+          {/* FeedFusionsion Dehradun, Uttarakhand */}
         </p>
       </header>
       <main className="main-content md:flex md:justify-between md:p-4 md:mt-10 md:items-center lg:mt-14 lg:px-20">

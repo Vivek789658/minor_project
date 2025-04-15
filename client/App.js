@@ -13,6 +13,12 @@ import ErrorPage from "./Components/Home-page/ErrorComponent";
 import StudentNotifications from "./Components/student-page/Notifications";
 import ProfessorNotification from "./Components/professor-page/ProfessorNotification";
 import ContactPage from "./Components/student-page/Contact";
+import FeedbackForm from "./Components/student-page/FeedbackForm";
+import Analytics from "./Components/student-page/Analytics";
+import Login from "./Components/Home-page/login";
+import FormDetailsPage from "./Components/student-page/FormDetailsPage";
+import AdminFeedbackView from "./Components/admin-page/AdminFeedbackView";
+import EditFeedbackForm from "./Components/admin-page/EditFeedbackForm";
 
 function useUserType() {
   const userDataString = localStorage.getItem("userData");
@@ -25,52 +31,49 @@ function useRoutesForUser(userType) {
     case "admin":
       return (
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<Login />} />
           <Route path="/admin" element={<AdminPage />} />
-          <Route path="*" element={<ErrorPage />} />{" "}
+          <Route path="/admin/feedback" element={<AdminFeedbackView />} />
+          <Route path="/admin/edit-feedback-form/:formName" element={<EditFeedbackForm />} />
+          <Route path="*" element={<ErrorPage />} />
         </Routes>
       );
     case "professor":
       return (
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<Login />} />
           <Route path="/professor" element={<ProfessorPage />} />
           <Route path="/user/:_id" element={<Profile />} />
-          <Route
-            path="/seeFeedback/:feedbackFormName"
-            element={<SeeFeedback />}
-          />
-          <Route
-            path="/professor/notifications"
-            element={<ProfessorNotification />}
-          />
+          <Route path="/see-feedback/:feedbackFormName" element={<SeeFeedback />} />
+          <Route path="/professor/notifications" element={<ProfessorNotification />} />
           <Route path="/professor/contact" element={<ContactPage />} />
-          <Route path="*" element={<ErrorPage />} />{" "}
+          <Route path="/feedback/:formName" element={<FeedbackForm />} />
+          <Route path="/student/form-details/:formName" element={<FormDetailsPage />} />
+          <Route path="/feedback/:formId" element={<FeedbackForm />} />
+          <Route path="*" element={<ErrorPage />} />
         </Routes>
       );
     case "student":
       return (
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<Login />} />
           <Route path="/student" element={<StudentPage />} />
           <Route path="/user/:_id" element={<Profile />} />
-          <Route
-            path="/giveFeedback/:feedbackFormName"
-            element={<GiveFeedback />}
-          />
-          <Route
-            path="/student/notifications"
-            element={<StudentNotifications />}
-          />
+          <Route path="/give-feedback/:formName" element={<GiveFeedback />} />
+          <Route path="/student/notifications" element={<StudentNotifications />} />
           <Route path="/student/contact" element={<ContactPage />} />
-          <Route path="*" element={<ErrorPage />} />{" "}
+          <Route path="/student/analytics" element={<Analytics />} />
+          <Route path="/student/form-details/:formName" element={<FormDetailsPage />} />
+          <Route path="/feedback/:formName" element={<FeedbackForm />} />
+          <Route path="/feedback/:formId" element={<FeedbackForm />} />
+          <Route path="*" element={<ErrorPage />} />
         </Routes>
       );
     default:
       return (
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="*" element={<ErrorPage />} />{" "}
+          <Route path="/" element={<Login />} />
+          <Route path="*" element={<ErrorPage />} />
         </Routes>
       );
   }
@@ -83,7 +86,7 @@ const AppLayout = () => {
   return <div>{routes}</div>;
 };
 
-const root = ReactDOM.createRoot(document.getElementById("main-root"));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <Router>
     <AppLayout />
